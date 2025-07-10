@@ -203,11 +203,25 @@ content: |
   
   Supported providers include:
   
-  - [Google](./google.md)
-  - [GitHub](./github.md)
-  - [GitLab](./gitlab.md)
-  - [Discord](./discord.md)
+  - [Discord](./discord.md) <small>(Planned)</small>
+  - [GitHub](./github.md) <small>(Planned)</small>
+  - [GitLab](./gitlab.md) <small>(Planned)</small>
+  - [Google](./google.md) <small>(Planned)</small>
+  - [Reddit](./reddit.md) <small>(Planned)</small>
+  - [Spotify](./spotify.md) <small>(Planned)</small>
+  - [Twitch](./twitch.md) <small>(Planned)</small>
   - Any identity provider compliant with [OpenID Connect](./oidc.md)
+  
+  > [!TIP] Workaround
+  > While most providers aren't officially supported yet, many can still be used via generic OIDC configuration.  
+  > For example, Discord and GitLab are OIDC compatible and can be manually integrated:
+  > ```dotenv
+  > OIDC_CLIENT_ID=<your discord application's client ID>
+  > OIDC_CLIENT_SECRET=<your discord application's client secret>
+  > OIDC_DISCOVERY_URL=https://discord.com/.well-known/openid-configuration
+  > OIDC_SCOPES="identity email"
+  > OIDC_DISPLAY_NAME="Discord"
+  > ```
   
   ### Setup Example (GitLab)
   
@@ -296,6 +310,24 @@ content: |
   
 
 ---
+url: /hosting/authentication/reddit
+content: |
+  <!-- @include: @/en/.in-work.md -->
+  
+
+---
+url: /hosting/authentication/spotify
+content: |
+  <!-- @include: @/en/.in-work.md -->
+  
+
+---
+url: /hosting/authentication/twitch
+content: |
+  <!-- @include: @/en/.in-work.md -->
+  
+
+---
 url: /hosting/configuration
 content: |
   <!-- @include: @/en/.in-work.md -->
@@ -304,7 +336,7 @@ content: |
 ---
 url: /hosting/configuration/mail-support
 content: |
-  # Mail Support Configuration (Optional)
+  # Mail Support (Optional)
   
   The mail service is **optional**, but highly recommended if you want to enable features like:
   
@@ -373,9 +405,9 @@ content: |
   MAIL_SERVER=smtp.gmail.com
   MAIL_PORT=465
   MAIL_USE_CREDENTIALS=true
-  MAIL_USERNAME=your.email@gmail.com
+  MAIL_USERNAME=notivae@gmail.com
   MAIL_PASSWORD=your_app_password
-  MAIL_FROM="Your Name <your.email@gmail.com>"
+  MAIL_FROM="Notivae <notivae@gmail.com>"
   MAIL_USE_TLS=true
   MAIL_VALIDATE_CERTS=true
   ```
@@ -386,9 +418,9 @@ content: |
   MAIL_SERVER=smtp.mailgun.org
   MAIL_PORT=587
   MAIL_USE_CREDENTIALS=true
-  MAIL_USERNAME=postmaster@sandbox123.mailgun.org
+  MAIL_USERNAME=notivae@sandbox123.mailgun.org
   MAIL_PASSWORD=your_mailgun_password
-  MAIL_FROM="App Notifications <postmaster@sandbox123.mailgun.org>"
+  MAIL_FROM="Notivae <notivae@sandbox123.mailgun.org>"
   MAIL_START_TLS=true
   MAIL_VALIDATE_CERTS=true
   ```
@@ -399,7 +431,7 @@ content: |
   MAIL_SERVER=localhost
   MAIL_PORT=25
   MAIL_USE_CREDENTIALS=false
-  MAIL_FROM="App Dev <dev@example.com>"
+  MAIL_FROM="Notivae <notivae@example.com>"
   MAIL_USE_TLS=false
   MAIL_START_TLS=false
   MAIL_VALIDATE_CERTS=false
@@ -450,6 +482,87 @@ content: |
   * `MAIL_FROM` supports both plain email addresses and `"Name <email@example.com>"` formats.
   * If you're using 2FA on your email account (e.g., Gmail), you'll need an [App Password](https://support.google.com/accounts/answer/185833).
   * Some SMTP servers require you to enable "less secure apps" or explicitly enable SMTP access.
+  
+
+---
+url: /hosting/configuration/virus-scanning-support
+content: |
+  # 🛡️ Virus Scanning (Optional)
+  
+  Notivae supports **optional virus scanning** for uploaded files. This feature is designed to improve security in environments where users can upload arbitrary attachments — especially in multi-user or publicly accessible deployments.
+  
+  ## ✅ Overview
+  
+  Virus scanning is **disabled by default** and only activates if the following two environment variables are set:
+  
+  ```env
+  CLAMAV_HOST=<host>
+  CLAMAV_PORT=<port>
+  ```
+  
+  When both are defined, Notivae will attempt to connect to the ClamAV service. If the connection fails at runtime while virus scanning is enabled, **file uploads will be rejected** for safety.
+  
+  ## 🔧 When to Enable Virus Scanning
+  
+  You should enable virus scanning when:
+  
+  - Notivae is hosted on a **public-facing server**
+  - You allow **guest access via shared links**
+  - You're running Notivae in an **enterprise or shared environment**
+  - You want defense against **known malware or trojan file uploads**
+  
+  It’s typically **not necessary** for:
+  - Local, private deployments
+  - Environments where all users are trusted
+  
+  ## 🔍 How It Works
+  
+  When enabled:
+  - Uploaded attachments are streamed to disk
+  - Once stored, the file is scanned using the ClamAV service
+  - If a threat is detected, the file is immediately deleted and the upload fails with an error
+  - Clean files proceed as normal
+  
+  ## 🐳 Docker Compose Setup
+  
+  To enable virus scanning, add the ClamAV service to your `docker-compose.yml`:
+  
+  ```yaml
+  services:
+    clamav:
+      image: clamav/clamav:stable_base
+      restart: unless-stopped
+      volumes:
+        - clamav-db:/var/lib/clamav  # persists virus signature database
+  
+  volumes:
+    clamav-db:
+  ```
+  
+  This image automatically checks for virus database updates **once per day**.
+  
+  ## ⚠️ Resource Requirements
+  
+  ClamAV requires a **significant amount of RAM** to function properly. According to official documentation:
+  
+  - Minimum recommended: **3 GB RAM**
+  - Optimal: **4 GB+ RAM**, depending on signature database and traffic
+  
+  You should not enable virus scanning on hosts with limited memory or swap space unless you're confident in available resources.
+  
+  ## 🧪 Testing Virus Scanning
+  
+  To verify that virus scanning is active and working, you can use the **EICAR test file**, a harmless file designed to trigger antivirus systems.
+  
+  Download or create it using the official test string: <https://www.eicar.org/download-anti-malware-testfile/>
+  
+  Upload this file to Notivae. If scanning is active, it will be rejected with a message like:
+  
+  ```
+  Virus detected: Eicar-Test-Signature
+  ```
+  
+  This confirms that your scanner integration is functional.
   
 
 ---

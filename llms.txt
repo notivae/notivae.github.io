@@ -1,0 +1,1542 @@
+---
+url: /core-concepts/access-control
+content: |
+  <!-- @include: @/en/.in-work.md -->
+  
+
+---
+url: /core-concepts/core-concepts
+content: |
+  # 🧩 Core Concepts
+  
+  Notivae is more than just a markdown editor — it’s a structured knowledge system designed to support real-time collaboration, offline editing, and granular access control. This page explains the key building blocks of the system so you can better understand how everything fits together.
+  
+  ## Workspaces
+  
+  A **Workspace** is the top-level container for organizing your notes. Each user has exactly one personal workspace, created automatically when they sign up.
+  
+  Workspaces contain:
+  
+  - All of your collections and documents
+  - Snapshot and comment metadata
+  - Your personal structure and content — isolated from other users
+  
+  At this stage, workspaces are **private and personal**. Shared workspaces and collaboration across workspaces are planned for future versions.
+  
+  ## Collections
+  
+  **Collections** are folders within a workspace. They help you group related documents (like a project, course, or topic).
+  
+  You can:
+  
+  - Create multiple collections in a workspace
+  - Nest documents inside collections
+  - Use collections to manage shared access
+  
+  ## Documents
+  
+  **Documents** are where your actual content lives. They are markdown-based and support:
+  
+  - Real-time collaborative editing
+  - Offline-first changes (synced automatically)
+  - Rich markdown syntax (code blocks, tables, images)
+  - Inline comments and snapshot versioning
+  
+  Documents are always part of a collection and can optionally be **nested** under other documents to form deep hierarchies.
+  
+  ## Hierarchical Structure
+  
+  Notivae supports nested documents — much like files inside folders. This allows you to mirror complex knowledge models:
+  
+  ```text
+  📁 Programming Notes
+   ┣ 📄 Languages
+   ┃ ┣ 📄 Rust
+   ┃ ┗ 📄 Python
+   ┣ 📄 Tools
+   ┃ ┗ 📄 Docker
+   ┗ 📄 Personal Roadmap
+  ```
+  
+  Each document can act like both a page and a container. Nesting is currently limited to a reasonable depth to maintain performance and usability.
+  
+  ## Comments & Discussions
+  
+  You can leave inline comments on specific parts of a document to start discussions or request feedback. Comments are threaded, can be resolved, and are tied to document versions.
+  
+  ## Snapshots
+  
+  A **Snapshot** is like a commit: it captures the current state of a document at a point in time. You can:
+  
+  * Create a named snapshot (e.g. “Final draft”)
+  * Restore a snapshot if needed
+  * Compare changes between versions (planned)
+  
+  Snapshots are local to each document and are automatically timestamped.
+  
+  ## Access Control
+  
+  Notivae uses a flexible **Attribute-Based Access Control (ABAC)** system. Instead of fixed roles (like “admin” or “editor”), permissions are evaluated based on:
+  
+  * User attributes (e.g. user ID, workspace role)
+  * Resource attributes (e.g. document owner, collection ID)
+  * Context (e.g. shared via public link, authenticated session)
+  
+  More on this in the [Access Control](./access-control.md) section.
+  
+  ## Sync & Offline-First
+  
+  All edits are made locally first and then synced in the background when connectivity is available. This makes Notivae usable even when you're offline or have an unstable connection.
+  
+  Conflict resolution is handled automatically using CRDTs (conflict-free replicated data types), which ensure consistent merging without losing user edits.
+  
+  ---
+  
+  Understanding these core ideas will help you make the most of Notivae — whether you're organizing your own notes or collaborating with others across a shared knowledge base.
+  
+
+---
+url: /hosting/authentication/discord
+content: |
+  # Authentication via Discord
+  
+  This guide explains how to set up authentication via Discord for your application.
+  
+  ## Prerequisites
+  
+  1. A valid Discord account.
+  2. Access to the [Discord Developer Portal](https://discord.com/developers/applications/).
+  3. Your application's domain or URL where the authentication system will be integrated.
+  
+  ## Environment Variables
+  
+  ```dotenv
+  DISCORD_CLIENT_ID=
+  DISCORD_CLIENT_SECRET=
+  ```
+  
+  | Variable                | Description                      |
+  |-------------------------|----------------------------------|
+  | `DISCORD_CLIENT_ID`     | Your application's Client ID     |
+  | `DISCORD_CLIENT_SECRET` | Your application's Client Secret |
+  
+  ::: details Hidden Variables
+  
+  ```dotenv
+  DISCORD_DISCOVERY_URI=https://discord.com/.well-known/openid-configuration
+  DISCORD_SCOPES="openid profile email"
+  ```
+  
+  | Variable                | Description                                           |
+  |-------------------------|-------------------------------------------------------|
+  | `DISCORD_DISCOVERY_URI` | Url to discord's OpenID configuration file            |
+  | `DISCORD_SCOPES`        | Space-separated list of scopes requested during login |
+  
+  :::
+  
+  ## Setup Instructions
+  
+  ### Step 1: Register an application
+  
+  1. Head over to the [Discord Developer Portal](https://discord.com/developers/applications/)
+  2. Click on **New application**
+  3. Provide a name for your application and agree to the terms of service
+  
+  ![Discord Create Application](assets/discord-create-application.png)
+  
+  ### Step 2: Retrieve OAuth credentials
+  
+  1. In the sidebar under **Settings** click on **OAuth2**
+  2. Locate the following credentials:
+     - **Client ID**: Copy this value 
+     - **Client Secret**: Click on "Reset secret", confirm, and copy the generated value 
+  
+  ![Client ID and Client Secret](assets/discord-client-id-secret.png)
+  
+  ### Step 3: Configure Redirect URLs
+  
+  1. Scroll to the **Redirect** section under **OAuth2**
+  2. Click **Add Redirect** and provide your callback URL in the following format: \
+     `https://<YOUR DOMAIN>/api/auth/discord/callback` \
+     Replace `<YOUR_DOMAIN>` with your application's actual domain name.
+  
+  ![Add Redirects](assets/discord-redirect-url.png)
+  
+
+---
+url: /hosting/authentication/github
+content: |
+  <!-- @include: @/en/.in-work.md -->
+  
+
+---
+url: /hosting/authentication/gitlab
+content: |
+  <!-- @include: @/en/.in-work.md -->
+  
+
+---
+url: /hosting/authentication/google
+content: |
+  <!-- @include: @/en/.in-work.md -->
+  
+
+---
+url: /hosting/authentication
+content: |
+  # 🔐 Authentication
+  
+  Notivae offers a flexible and self-contained authentication system, giving you full control over user data and login flows. It supports both traditional account-based login and external [OAuth/OIDC identity providers](#oauth--oidc-authentication).
+  
+  ## Username Support
+  
+  Users can log in using either:
+  
+  * Email address
+  * Or a unique **username** (set during sign-up)
+  
+  For email/password login details, refer to [Password-based Authentication](./password.md).
+  
+  ## OAuth / OIDC Authentication
+  
+  Notivae supports logging in via third-party identity providers using the OIDC protocol. This enables users to authenticate without managing passwords directly.
+  
+  Supported providers include:
+  
+  - [Google](./google.md)
+  - [GitHub](./github.md)
+  - [GitLab](./gitlab.md)
+  - [Discord](./discord.md)
+  - Any identity provider compliant with [OpenID Connect](./oidc.md)
+  
+  ### Setup Example (GitLab)
+  
+  ```dotenv
+  GITLAB_CLIENT_ID=your-client-id
+  GITLAB_CLIENT_SECRET=your-client-secret
+  GITLAB_ISSUER=https://gitlab.example.com/.well-known/openid-configuration
+  ```
+  
+  More providers will be documented with exact values and setup instructions once the integration layer stabilizes.
+  
+  ## System Management
+  
+  A **system admin account** is created during the initial setup. This account has full access to all instance-level configuration and user management features.
+  
+  ## Session Management
+  
+  Sessions are handled using secure HTTP-only cookies. No client-side tokens are stored in `localStorage` or exposed to JavaScript. All tokens are cryptographically signed and validated on the backend to ensure integrity and security.
+  
+  ## Planned Features
+  
+  * Email verification and password reset flows
+  * Admin UI for user management (per instance)
+  * Optional 2FA support (TOTP-based)
+  * SSO login restrictions (e.g. only allow GitHub org members)
+  
+  ---
+  
+  For more on how access is evaluated across documents and collections, see [Access Control](../../core-concepts/access-control.md).
+  
+
+---
+url: /hosting/authentication/oidc
+content: |
+  # Authentication via OpenID Connect (OIDC)
+  
+  This guide explains how to set up authentication via any OpenID Connect compatible provider.
+  
+  ## Prerequisites
+  
+  1. Access to a valid OpenID Connect provider (e.g. [Authentik](https://goauthentik.io/), [Auth0](https://auth0.com/), [Keycloak](https://www.keycloak.org/), [Okta](https://www.okta.com/))
+  2. Permissions to register a new application/client on the provider
+  3. Your application's domain or public URL for handling authentication callbacks
+  
+  ## Environment Variables
+  
+  ```dotenv
+  OIDC_CLIENT_ID=
+  OIDC_CLIENT_SECRET=
+  OIDC_DISCOVERY_URI=https://auth.example.com/.well-known/openid-configuration
+  OIDC_DISPLAY_NAME="OpenID"
+  ```
+  
+  | Variable             | Description                                                                                          |
+  |----------------------|------------------------------------------------------------------------------------------------------|
+  | `OIDC_CLIENT_ID`     | The client/application ID from your OIDC provider                                                    |
+  | `OIDC_CLIENT_SECRET` | The client secret associated with the OIDC client ID                                                 |
+  | `OIDC_DISCOVERY_URI` | The URI pointing to the OIDC discovery document (usually ends in `.well-known/openid-configuration`) |
+  | `OIDC_DISPLAY_NAME`  | The name shown to users during login (e.g., "Login with OpenID")                                     |
+  
+  ::: details Hidden Variables
+  
+  ```dotenv
+  OIDC_SCOPES="openid profile email"
+  ```
+  
+  | Variable                | Description                                           |
+  |-------------------------|-------------------------------------------------------|
+  | `OIDC_SCOPES`           | Space-separated list of scopes requested during login |
+  
+  :::
+  
+  ## Common Parameter
+  
+  These values are often required by your OIDC provider.
+  
+  | Parameter    | Value                                          |
+  |--------------|------------------------------------------------|
+  | Redirect URI | `https://<YOUR-DOMAIN>/api/auth/oidc/callback` |
+  
+
+---
+url: /hosting/authentication/password
+content: |
+  <!-- @include: @/en/.in-work.md -->
+  
+
+---
+url: /hosting/configuration
+content: |
+  <!-- @include: @/en/.in-work.md -->
+  
+
+---
+url: /hosting/configuration/mail-support
+content: |
+  # Mail Support Configuration (Optional)
+  
+  The mail service is **optional**, but highly recommended if you want to enable features like:
+  
+  - Email verification for user signups
+  - Notification systems (e.g., for comment threads)
+  - Error notifications sent to administrators
+  - Admin approval mails for account creation if `APP_ACCOUNT_CREATION=restricted`
+  - Password reset flows
+  - Other user or admin-triggered messages
+  
+  If not configured, these features will silently degrade or fallback to no-ops.
+  
+  ## Prerequisites
+  
+  1. Access to a working SMTP server (e.g., Gmail, Mailgun, SendGrid, your own).
+  2. A valid sender email address and credentials (if required).
+  
+  ## Environment Variables
+  
+  ```dotenv
+  MAIL_SERVER=
+  MAIL_PORT=
+  MAIL_USE_CREDENTIALS=true
+  MAIL_USERNAME=
+  MAIL_PASSWORD=
+  MAIL_FROM=
+  MAIL_USE_TLS=false
+  MAIL_START_TLS=
+  MAIL_VALIDATE_CERTS=true
+  MAIL_TEMPLATES_DIR=
+  ```
+  
+  | Variable               | Description                                                                                      |
+  |------------------------|--------------------------------------------------------------------------------------------------|
+  | `MAIL_SERVER`          | SMTP server hostname or IP address (e.g., `smtp.gmail.com`)                                      |
+  | `MAIL_PORT`            | SMTP port. Defaults: `465` if `MAIL_USE_TLS=true`, `587` if `MAIL_START_TLS=true`, else `25`     |
+  | `MAIL_USE_CREDENTIALS` | Whether to authenticate using `MAIL_USERNAME` and `MAIL_PASSWORD`                                |
+  | `MAIL_USERNAME`        | Username for SMTP login                                                                          |
+  | `MAIL_PASSWORD`        | Password (or app password) for SMTP login                                                        |
+  | `MAIL_FROM`            | Email address or `"Name <email@example.com>"` to use in the `From` header                        |
+  | `MAIL_USE_TLS`         | If `true`, use TLS immediately on connect. Mutually exclusive with `MAIL_START_TLS`              |
+  | `MAIL_START_TLS`       | If `true`, upgrade to TLS via STARTTLS after connecting. Overrides server STARTTLS support check |
+  | `MAIL_VALIDATE_CERTS`  | Whether to validate server certificates                                                          |
+  | `MAIL_TEMPLATES_DIR`   | Optional directory path to custom jinja email templates                                          |
+  
+  ::: details TLS vs STARTTLS
+  
+  SMTP supports two common encryption modes:
+  - TLS (SMTPS): Encrypts the connection from the beginning (use port 465)
+  - STARTTLS: Starts unencrypted, then upgrades to TLS via the STARTTLS command (use port 587)
+  
+  Set only one of the following:
+  - MAIL_USE_TLS=true: use SMTPS over port 465 (implicit TLS)
+  - MAIL_START_TLS=true: use SMTP with STARTTLS over port 587 (explicit TLS)
+  - Set both to false: use unencrypted SMTP, typically on port 25 (for internal or development servers)
+  
+  Do not enable both TLS and STARTTLS.
+  
+  :::
+  
+  ## Example Configurations
+  
+  ### Gmail (App Passwords)
+  
+  ```dotenv
+  MAIL_SERVER=smtp.gmail.com
+  MAIL_PORT=465
+  MAIL_USE_CREDENTIALS=true
+  MAIL_USERNAME=your.email@gmail.com
+  MAIL_PASSWORD=your_app_password
+  MAIL_FROM="Your Name <your.email@gmail.com>"
+  MAIL_USE_TLS=true
+  MAIL_VALIDATE_CERTS=true
+  ```
+  
+  ### Mailgun
+  
+  ```dotenv
+  MAIL_SERVER=smtp.mailgun.org
+  MAIL_PORT=587
+  MAIL_USE_CREDENTIALS=true
+  MAIL_USERNAME=postmaster@sandbox123.mailgun.org
+  MAIL_PASSWORD=your_mailgun_password
+  MAIL_FROM="App Notifications <postmaster@sandbox123.mailgun.org>"
+  MAIL_START_TLS=true
+  MAIL_VALIDATE_CERTS=true
+  ```
+  
+  ### Localhost (No Auth, No TLS)
+  
+  ```dotenv
+  MAIL_SERVER=localhost
+  MAIL_PORT=25
+  MAIL_USE_CREDENTIALS=false
+  MAIL_FROM="App Dev <dev@example.com>"
+  MAIL_USE_TLS=false
+  MAIL_START_TLS=false
+  MAIL_VALIDATE_CERTS=false
+  ```
+  
+  ## Optional: Email Templates
+  
+  The mail system comes with built-in HTML templates rendered using **Jinja2**.  
+  To override any of them, you can mount a custom template directory and set:
+  
+  ```dotenv
+  MAIL_TEMPLATES_DIR=/templates/emails
+  ````
+  
+  Each custom template file must match the filename (and extension) of the default it's replacing.
+  The expected extension is: **`.html.j2`**
+  
+  Modify you `docker-compose.yml` to mount your templates and set the environment variable.
+  
+  ```yaml
+  services:
+    server:
+      image: ghcr.io/notivae/server
+      ...
+      environment:
+        MAIL_TEMPLATES_DIR: /templates/emails
+      volumes:
+        - ./my-custom-templates:/templates/emails:ro
+  ```
+  
+  This will override any built-in template that has a matching `.html.j2` file in `./my-custom-templates`.
+  
+  ::: warning ⚠️ Important Notes 
+  
+  * Only override templates you fully understand
+  * Do **not** attempt to create custom mail templates unless you are comfortable with:
+  
+    * Jinja2 syntax and escaping
+    * HTML for email clients (tables, inline styles, etc.)
+    * Required template filenames (e.g., `verify_email.html.j2`, `reset_password.html.j2`)
+    * The variables available inside each template (not documented)
+  * Missing or broken templates won't fall back to the default built-in ones
+  
+  :::
+  
+  ## Additional Notes
+  
+  * `MAIL_FROM` supports both plain email addresses and `"Name <email@example.com>"` formats.
+  * If you're using 2FA on your email account (e.g., Gmail), you'll need an [App Password](https://support.google.com/accounts/answer/185833).
+  * Some SMTP servers require you to enable "less secure apps" or explicitly enable SMTP access.
+  
+
+---
+url: /hosting/self-hosting
+content: |
+  <!-- @include: @/en/.in-work.md -->
+  
+
+---
+url: /
+content: |
+  ---
+  # https://vitepress.dev/reference/default-theme-home-page
+  layout: home
+  
+  hero:
+    name: "Notivae"
+    text: "Self-hosted collaborative markdoen editor"
+    tagline: "Structure your knowledge. Collaborate in real time. Stay in control"
+    actions:
+      - theme: brand
+        text: Get Started
+        link: /start/introduction
+      - theme: alt
+        text: FAQ
+        link: /other/faq
+      - theme: alt
+        text: GitHub Repo
+        link: https://github.com/notivae/notivae
+  
+  features:
+    - icon: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users-icon lucide-users"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M16 3.128a4 4 0 0 1 0 7.744"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></svg>
+      title: Real-Time Collaboration
+      details: Multi-user editing with CRDTs for seamless, conflict-free collaboration.
+    - icon: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-folder-tree-icon lucide-folder-tree"><path d="M20 10a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1h-2.5a1 1 0 0 1-.8-.4l-.9-1.2A1 1 0 0 0 15 3h-2a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1Z"/><path d="M20 21a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1h-2.9a1 1 0 0 1-.88-.55l-.42-.85a1 1 0 0 0-.92-.6H13a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1Z"/><path d="M3 5a2 2 0 0 0 2 2h3"/><path d="M3 3v13a2 2 0 0 0 2 2h3"/></svg>
+      title: Structured Note Collections
+      details: Organize content into nested folders and sub-documents for deep knowledge systems.
+    - icon: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-wifi-off-icon lucide-wifi-off"><path d="M12 20h.01"/><path d="M8.5 16.429a5 5 0 0 1 7 0"/><path d="M5 12.859a10 10 0 0 1 5.17-2.69"/><path d="M19 12.859a10 10 0 0 0-2.007-1.523"/><path d="M2 8.82a15 15 0 0 1 4.177-2.643"/><path d="M22 8.82a15 15 0 0 0-11.288-3.764"/><path d="m2 2 20 20"/></svg>
+      title: Offline-First, Sync-Later
+      details: Work offline anytime — Notivae syncs automatically once you're back online.
+    - icon: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-history-icon lucide-history"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
+      title: Snapshot Versioning
+      details: Create versioned “commits” of any document, enabling safe rollbacks and change tracking.
+    - icon: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-circle-more-icon lucide-message-circle-more"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/><path d="M8 12h.01"/><path d="M12 12h.01"/><path d="M16 12h.01"/></svg>
+      title: Inline Comments & Discussions
+      details: Add context-aware feedback and threaded conversations right inside your documents.
+    - icon: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-lock-icon lucide-book-lock"><path d="M18 6V4a2 2 0 1 0-4 0v2"/><path d="M20 15v6a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H10"/><rect x="12" y="6" width="8" height="5" rx="1"/></svg>
+      title: Privacy-First & Self-Hosted
+      details: Own your data completely. No third-party dependencies required.
+  ---
+  
+  > [!IMPORTANT]
+  > Notivae is in early development. Expect breaking changes and limited support.
+  
+  ## 📖 What is Notivae?
+  
+  **Notivae** is a **self-hosted**, **real-time collaborative markdown editor** built for **students**, **researchers**, and **professionals** who value structure, clarity, and ownership of their knowledge.
+  
+  Inspired by Latin roots meaning “related to notes”, Notivae empowers users to **write**, **collaborate**, and **organize** their thoughts in a flexible but structured environment — all without giving up control to third-party platforms.
+  
+  Whether you're managing **study notes**, **drafting papers**, **planning projects**, or building a long-term **knowledge base**, Notivae helps you stay productive and in control.
+  
+  ### 🧠 Key Capabilities
+  
+  - **Markdown-first experience** — Focused, clean writing interface powered by a modern Markdown engine.
+  - **Real-time collaboration** — CRDT-based multi-user editing with zero merge conflicts.
+  - **Hierarchical structure** — Nest documents within collections and subfolders to mirror your mental model.
+  - **Snapshots for versioning** — Create named snapshots of documents to mark stable revisions, much like commits in Git.
+  - **Inline comments** — Add and resolve context-specific feedback for discussion and peer review.
+  - **Granular access control** — Share documents via public links or restrict access with per-user permissions.
+  - **Offline support** — Fully functional offline editing with automatic background sync when reconnected.
+  - **Authentication options** — Sign in via email/password or OAuth providers like GitHub, GitLab, Discord, and any OIDC-compatible system.
+  - **Fully self-hosted** — No reliance on external services like Supabase, S3, or Firebase. Your data stays yours.
+  - **Early-stage roadmap** — Planned features include a user dashboard, export to PDF/Markdown, comment threads, mobile improvements, and API support.
+  
+  > [!NOTE] ✨ Built with ❤️ by and for students who believe that knowledge should be open, structured, and self-owned.
+  
+  Explore the docs to [get started](start/introduction.md), contribute, or deploy your own instance of Notivae.
+  
+
+---
+url: /intelligence/features
+content: |
+  <!-- @include: @/en/.in-work.md -->
+  
+
+---
+url: /intelligence/installation
+content: |
+  <!-- @include: @/en/.in-work.md -->
+  
+
+---
+url: /intelligence/introduction
+content: |
+  # Intelligence (AI/ML Module)
+  
+  > [!IMPORTANT] ⚠️ Work in Progress
+  > The Intelligence module is not yet available.  
+  > The features described below are *conceptual* and may not be implemented yet or at all.  
+  > This page outlines planned functionality and areas under consideration.
+  
+  ---
+  
+  The **Intelligence module** is an optional service that enhances Notivae with AI/ML-powered capabilities — all running locally on the user’s system. When enabled, this module allows users to automate, analyze, and organize their content more effectively using machine learning techniques.  
+  
+  This service is completely self-contained and runs in a separate container. Users who prefer a lightweight or privacy-focused setup can simply choose not to install or enable it.  
+  
+  ## ✨ Intelligent Content Features
+  
+  These features are designed to assist with content creation, cleanup, and refinement:
+  
+  - **Reviewer**  
+    Analyzes a document and recommends:
+    - Grammar and spelling corrections
+    - Stylistic rewrites
+    - Clarity improvements
+  
+  - **OCR (Optical Character Recognition)**  
+    Converts images (e.g., scans, handwritten notes, photos of slides) into searchable, editable text.  
+    Useful for:
+    - Better document indexing and search
+    - Extracting text from screenshots or PDFs
+  
+  - **Auto-title Generator**  
+    Suggests meaningful titles for untitled documents.  
+    May also recommend improved or standardized titles for renamed files.
+  
+  - **Automatic Tag Suggestion**  
+    Analyzes the content of a document and suggests relevant tags to improve organization and discoverability.  
+    Suggestions are based on:
+    - Keyword extraction
+    - Semantic understanding of the text
+    - Cross-referencing existing tags across the workspace
+  
+    This helps reduce manual tagging effort and promotes consistency in tag usage.
+  
+  - **Version Diff Summarization**  
+    Generates a natural language summary describing what has changed between different versions of a document.
+  
+  - **Smart Paste**  
+    When pasting content into a document, this feature can:
+    - Automatically clean up formatting
+    - Summarize large blocks of text
+    - Extract key points or quotes
+  
+  ## 🔍 Search & Organization
+  
+  Enhancements that help structure and navigate large volumes of notes and documents:
+  
+  - **Semantic Search**  
+    Goes beyond keyword search by understanding the *meaning* of queries and document content.  
+    Enables searching for concepts, not just exact terms.
+  
+  - **Topic Clustering**  
+    Automatically groups related documents based on shared themes or subjects.  
+    Ideal for organizing notes across broad topics or courses.
+  
+  ## 🎙️ Audio & Speech
+  
+  Advanced tools for working with voice data and recordings:
+  
+  - **Audio-to-Text Transcription**  
+    Converts spoken content (e.g. meeting recordings, lectures) into text for documentation or further processing.
+  
+  - **Meeting Summarization & Tagging**  
+    Automatically identifies key moments and tags from recorded discussions.  
+    Can generate summaries or action items.
+  
+  ## 🧩 Architecture Note
+  
+  All features are intended to:
+  - Run locally (no cloud dependency)
+  - Be modular and optional
+  - Be securely accessed via the main Notivae backend
+  - Respect user resources — features are only triggered intentionally or in controlled background tasks
+  
+  ---
+  
+  Stay tuned for implementation progress and configuration guides once development starts on the Intelligence module.
+  
+
+---
+url: /other/architecture-overview
+content: |
+  # 🏗️ Architecture Overview
+  
+  Notivae is designed as a modular, scalable, and self-hosted collaborative markdown editor. Understanding its architecture helps you grasp how components interact and how to deploy, extend, or contribute to the project.
+  
+  ## High-Level Components
+  
+  - **Frontend (Vue + Vite)**  
+    A modern single-page application providing the user interface for editing, navigation, commenting, and collaboration.
+  
+  - **Backend API (Python FastAPI)**  
+    Serves REST and WebSocket endpoints to handle authentication, document management, versioning, access control, and CRDT-based synchronization.
+  
+  - **Database (PostgreSQL)**  
+    Stores users, workspaces, collections, documents, snapshots, comments, permissions, etc.
+  
+  ## Component Interaction
+  
+  ```
+  +----------+            +--------------+          +----------------+
+  | Frontend | <--REST--> | Backend      | <--DB--> | Database       |
+  | (Vue)    | <---WS---> | (FastAPI)    |          | (PostgreSQL)   |
+  +----------+            +--------------+          +----------------+
+  ```
+  
+  ## Deployment Model
+  
+  - All components run inside Docker containers orchestrated via `docker-compose`.
+  - Ports are exposed for the frontend and backend.
+  - Persistent storage is configured for database files and user data.
+  
+  ## Offline-First and Sync
+  
+  - The frontend keeps a local replica of documents.
+  - Changes are applied locally and synced in the background via CRDTs.
+  - This approach guarantees no lost edits, even when offline or on unstable connections.
+  
+  ## Security and Access Control
+  
+  - Authentication is handled by the backend with support for email/password and OAuth/OIDC.
+  - Access to documents and collections is controlled using ABAC policies evaluated on the backend.
+  - All communications are secured via HTTPS in production (reverse proxy recommended).
+  
+  ---
+  
+  This modular design enables Notivae to be extended with features like API integrations, and enhanced collaboration tools without breaking core principles of privacy, ownership, and offline resilience.
+  
+
+---
+url: /other/contributing
+content: |
+  # 🤝 How to Contribute
+  
+  Notivae is an open-source project — built by and for people who care about structured, private, and collaborative knowledge management. Contributions are very welcome, whether you're a developer, designer, tester, writer, or just someone with feedback.
+  
+  ## 🧠 Ways to Contribute
+  
+  - **Code** — Implement features, fix bugs, refactor or improve developer experience
+  - **Docs** — Improve this documentation or write tutorials and guides
+  - **Testing** — Try out the app, report bugs, and suggest improvements
+  - **Design** — Help improve UX, visual design, or accessibility
+  - **Ideas** — Open issues or discussions to shape the roadmap
+  - **DevOps** — Help refine the Docker setup, CI/CD, deployment flow
+  
+  ## 📜 License & Contributor Expectations
+  
+  Notivae is GPL3.0-licensed. By contributing, you agree your work can be included under that license. All contributors are expected to follow basic standards of respectful, constructive collaboration.
+  
+  ---
+  
+  Thanks for helping shape Notivae.  
+  Let’s make knowledge open, structured, and self-owned.
+  
+
+---
+url: /other/design-decisions
+content: |
+  # 🎯 Design Decisions
+  
+  Notivae’s architecture and feature set are driven by clear design principles focused on user control, privacy, collaboration, and extensibility. This page outlines the key decisions behind the project’s foundation.
+  
+  ## 1. Self-Hosted First
+  
+  - Users retain full control over their data by running Notivae on their own infrastructure.
+  - No reliance on third-party services or proprietary cloud platforms.
+  - Ensures privacy, security, and compliance with personal or organizational policies.
+  
+  ## 2. Markdown-Native
+  
+  - Markdown is the universal format for writing and note-taking.
+  - Enables compatibility with many tools and simple import/export workflows.
+  - Avoids vendor lock-in by storing plain-text documents with semantic structure.
+  
+  ## 3. Real-Time Collaboration with CRDTs
+  
+  - Uses Conflict-Free Replicated Data Types (CRDTs) to enable seamless multi-user editing.
+  - Guarantees zero merge conflicts and automatic offline sync.
+  - Yjs is chosen as the CRDT library for its performance and community support.
+  
+  ## 4. Offline-First Approach
+  
+  - Users can read and edit documents without an internet connection.
+  - Local changes sync automatically once connectivity is restored.
+  - Provides resilience against unstable networks and improves usability on mobile devices.
+  
+  ## 5. Hierarchical Structure
+  
+  - Documents can be nested within collections and other documents.
+  - Mirrors natural knowledge organization: folders, subfolders, and pages.
+  - Enables granular access control and easier navigation in large knowledge bases.
+  
+  ## 6. Attribute-Based Access Control (ABAC)
+  
+  - Moves beyond rigid role-based permissions.
+  - Access is evaluated dynamically based on user attributes, document metadata, and context.
+  - Offers fine-grained control suitable for complex sharing and collaboration scenarios.
+  
+  ## 7. Simple Deployment
+  
+  - Uses Docker and Docker Compose for straightforward setup.
+  - Prebuilt images simplify installation for both developers and end-users.
+  - Designed for easy upgrades and maintenance.
+  
+  ---
+  
+  These decisions collectively shape Notivae into a privacy-respecting, user-centric, and robust platform for collaborative knowledge management.
+  
+
+---
+url: /other/faq
+content: |
+  # ❓ FAQ
+  
+  Frequently Asked Questions about Notivae — answered concisely.
+  
+  ## Is Notivae finished?
+  
+  No — Notivae is **very much a work in progress**. Core architecture is in place, but many features are still incomplete or entirely missing. Expect frequent changes, breaking migrations, and rough edges. It's not yet suitable for production use or critical data.
+  
+  
+  ## Can I use Notivae without an internet connection?
+  
+  Yes. Notivae is designed to be **offline-first**. You can open the app, edit documents, and your changes will sync once you're reconnected.
+  
+  
+  ## Does Notivae require any external services?
+  
+  No. Notivae is built to run fully isolated, without relying on any third-party services. Everything — backend, frontend, and database — runs locally by default.
+  
+  However, external dependencies can be added **optionally** to enhance functionality. For example:
+  
+  - External OAuth/OIDC providers for authentication (GitHub, GitLab, etc.)
+  - Externally managed PostgreSQL for improved performance, scalability, or backup automation
+  
+  
+  ## Is there support for real-time collaboration?
+  
+  Yes — Notivae uses **CRDT-based sync** to support real-time editing.
+  
+  
+  ## What format is content stored in?
+  
+  The primary focus is on **Markdown-based documents**, but Notivae also supports other plain text formats such as code files (e.g. `.js`, `.py`, `.json`).
+  
+  In the future, support for alternative structured formats like **Typst**, **AsciiDoc**, and **WikiText** is considered — along with proper editors and renderers for each format. This will allow more specialized workflows while keeping content structured and exportable.
+  
+  
+  ## Can I import my existing notes from Notion / Obsidian / Logseq?
+  
+  Not yet. But import/export support for common formats is on the roadmap. For now, you can manually paste or migrate content using Markdown.
+  
+  
+  ## Does Notivae support custom domains or HTTPS?
+  
+  Yes — simply reverse proxy it behind Nginx, Caddy, or Traefik and terminate HTTPS there. You'll configure this outside the Docker container.
+  
+  
+  ## Can I restrict who signs up?
+  
+  Eventually, yes. Planned features include:
+  
+  - Invite-only registration
+  - Restrict signups to a specific domain or OAuth provider (e.g. GitHub org)
+  
+  
+  ## Will there be mobile apps?
+  
+  Probably not. The current web app is being designed as a **Progressive Web App (PWA)** with offline support and responsive layout, which works well on mobile devices.
+  
+  
+  ## How do I contribute?
+  
+  Check out the [Contributing](./contributing.md) page and the [GitHub repo](https://github.com/notivae/notivae). Contributions of all kinds are welcome — code, docs, testing, ideas.
+  
+  
+  ---
+  
+  Missing a question?  
+  Open an issue or discussion on [GitHub](https://github.com/notivae/notivae/issues).
+  
+
+---
+url: /other/roadmap
+content: |
+  # 🛣️ Roadmap
+  
+  Notivae is in **early-stage development**. No features are fully implemented yet — everything listed below is planned but still in progress or under design. This roadmap gives a transparent view of where the project is heading.
+  
+  ## 🧱 Planned Foundation
+  
+  - Personal workspace per user
+  - Markdown-based document editor
+  - Collections for organizing documents
+  - Document nesting and hierarchy
+  - Offline-first editing
+  - Sync-on-connect model using CRDTs
+  - Snapshot-based versioning
+  - Inline comments and discussions
+  - Email/password authentication
+  - OIDC-based third-party login
+  - Self-hostable via Docker Compose
+  
+  ## 🛠️ Upcoming Development Focus
+  
+  - Frontend: editor UI, navigation, commenting
+  - Backend: data model, auth, syncing, access control
+  - Database schema
+  - First working end-to-end Docker setup
+  - Persistent volume storage and backup support
+  - CI for ghcr.io image builds
+  
+  ## 🧪 Future Features
+  
+  - Public sharing via links
+  - Invite-based sharing with per-user access control
+  - Full-text search across documents
+  - Export to PDF / Markdown
+  - Admin interface
+  - Comment threading & resolution
+  - Snapshot diffs
+  - Configurable themes
+  - REST and WebSocket APIs
+  - Mobile-first PWA enhancements
+  
+  ## 🧭 Long-Term Vision
+  
+  - Shared workspaces (teams, organizations)
+  - Plugin system for extensibility
+  - Self-hosted AI integration (summarization, search)
+  - Custom metadata fields for documents
+  - Workspace analytics and activity feed
+  
+  ---
+  
+  > 🚧 Everything is subject to change.  
+  > You can track progress or contribute on [GitHub](https://github.com/notivae/notivae).
+  
+
+---
+url: /start/installation
+content: |
+  
+  > [!IMPORTANT]
+  > Notivae is in early-stage development. No features are fully implemented yet.
+  
+  # 🧰 Installation
+  
+  Notivae can run on your own computer or server using **Docker**, a tool that bundles everything it needs. No need to install each part separately.
+  
+  We’ll use a tool called `docker-compose` to launch all components – the app, its backend, and the database – all with one command.
+  
+  ## 🔧 Prerequisites
+  
+  Make sure these are ready on your system:
+  
+  - [X] **Docker**  
+    [Install Docker](https://docs.docker.com/get-docker/)
+  
+  - [X] **Docker Compose**  
+    [Install Docker Compose](https://docs.docker.com/compose/install/)
+  
+  - [X] A machine that meets the [minimum requirements](../requirements.md)
+  
+  - [X] Basic knowledge of how to use a terminal (e.g., navigating folders, running commands)
+  
+  ---
+  
+  ## 📁 Setup Files
+  
+  To run Notivae, you'll need two files:
+  
+  1. **`docker-compose.yml`** – defines the services (frontend, backend, database), ports, and volumes.
+  2. **`.env`** – contains configuration settings like database passwords, ports, and secrets.
+  
+  Copy the following files to your local machine or server. We recommend placing them under `/srv/notivae-stack`.
+  - The `docker-compose.yml` file works as-is but can be customized to your environment or use case.
+  - The `.env` file **must** be reviewed and adjusted. Each variable has a comment or description in the sample. For a deeper explanation, see [Configuration](../../hosting/configuration/index.md).
+  
+  Your folder structure should look like this:
+  
+  ```text
+  📁 /srv/notivae-stack
+   ┣ 📄 docker-compose.yml
+   ┗ 📄 .env
+  ```
+  
+  > [!WARNING]
+  > These configuration files are currently in draft status and are not fully functional. Use them as a reference or base for manual setup until stable versions are released.
+  
+  ::: code-group
+  
+  <<< @/assets/docker-compose.yml
+  
+  <<< @/assets/.env.sample{dotenv}[.env]
+  
+  :::
+  
+  ## ▶️ Start the Stack
+  
+  From within the `/srv/notivae-stack` directory, run:
+  
+  ```bash
+  docker compose up -d
+  ```
+  
+  This command will:
+  
+  - Start the **database** and **cache** (for storage)
+  - Start the **backend** (the engine)
+  - Start the **frontend** (the user interface)
+  
+  Docker will automatically download any required images on the first run. This may take a while, depending on your internet connection.
+  
+  ## ✅ Verify
+  
+  After a few seconds, run this command in your terminal:
+  
+  ```
+  curl http://localhost:8765/healtz
+  ```
+  
+  You should see a simple response like:
+  
+  ```json
+  {"status":"ok"}
+  ```
+  
+  
+  If you see this message, it means the backend is running successfully and responding to requests.
+  
+  However, you **won’t be able to access the web interface yet.** The frontend and backend are exposed on different ports and cannot communicate directly in this setup.
+  
+  > [!INFO]
+  > 🛠️ To continue, you need to configure a [reverse proxy](./reverse-proxy.md) or another solution that connects the frontend to the backend under a unified address.  
+  > This is required before opening the web UI in your browser.
+  
+  ## 🌍 Connect Frontend and Backend
+  
+  Notivae’s frontend expects to reach the backend at `/api` on the **same domain and port** — for example:
+  
+  ```text
+  https://notivae.example.com     → frontend
+  https://notivae.example.com/api → backend
+  ```
+  
+  However, in the current setup, the backend and frontend are exposed on **different ports**:
+  
+  ```text
+  http://localhost:8766 → Frontend
+  http://localhost:8765 → Backend 
+  ```
+  
+  This means they **can’t communicate properly** until you combine them under a unified domain or port.
+  
+  The solution is a reverse proxy. A **reverse proxy** acts as a gateway that:
+  
+  - Routes browser requests to the correct service (frontend or backend)
+  - Handles HTTPS (SSL) if needed
+  - Rewrites paths like `/api/*` to target the backend
+  
+  This setup is required even if you're running Notivae locally.
+  
+  Popular reverse proxy options:
+  
+  - [Caddy](https://caddyserver.com/) — simple, automatic HTTPS
+  - [Traefik](https://traefik.io/traefik) — Docker-native, dynamic
+  - [Nginx](https://nginx.org/) — widely supported, configurable
+  
+  > 📘 Need help setting it up?  
+  > See the [Reverse Proxy Guide](./reverse-proxy.md) for setup examples and config snippets.
+  
+  > [!TIP]
+  > Hosting Notivae behind a home network? You may need a **tunnel** like [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/) or [Ngrok](https://ngrok.com/) to make it accessible from the internet.  
+  > This is also covered in the [Reverse Proxy Guide](./reverse-proxy.md).
+  
+  ## 🔁 Updating
+  
+  To update Notivae to the latest version:
+  
+  ```shell
+  docker-compose pull
+  docker-compose up -d
+  ```
+  
+  This will:
+  
+  - Pull the latest image versions
+  - Restart the containers using the updated versions
+  
+  > [!WARNING]
+  > This command works only if you are omitting or using floating tags like `:latest` or `:dev` in your `docker-compose.yml`. If you pin versions explicitly in `docker-compose.yml`, you need to update the tags manually before running pull.
+  
+  ## 🛑 Stopping the Stack
+  
+  To shut everything down:
+  
+  ```shell
+  docker-compose down
+  ```
+  
+  Your data (e.g., database files) will be preserved unless you remove the Docker volumes explicitly.
+  
+
+---
+url: /start/installation/reverse-proxy
+content: |
+  # 🛡️ Reverse Proxy Setup for Notivae
+  
+  To make Notivae work correctly, you need to set up a **reverse proxy**. This is required even for local installations — not just for exposing it to the internet.
+  
+  ## ❓ Why You Need a Reverse Proxy
+  
+  By default, Notivae’s frontend and backend are served on **different ports**:
+  
+  - Frontend: `http://localhost:8766`
+  - Backend: `http://localhost:8765`
+  
+  But the frontend is hardcoded to call the backend via `/api` on the **same host and port**. Without a reverse proxy, this fails, and the web UI won’t work.
+  
+  A reverse proxy solves this by:
+  
+  - Making both frontend and backend accessible from **one unified domain**
+  - Forwarding frontend requests to the frontend container
+  - Forwarding `/api` requests to the backend container
+  - Optionally handling HTTPS for secure public access
+  
+  ## ⚙️ What You’ll Need
+  
+  - A reverse proxy installed (see options below)
+  - A domain name (for internet-facing setups)
+  - Basic familiarity with editing config files or using Docker
+  
+  ## 🔧 Recommended Options
+  
+  | Tool        | Why Use It                           | Docs                                        |
+  |-------------|--------------------------------------|---------------------------------------------|
+  | **Caddy**   | Easiest to set up, automatic HTTPS   | [caddyserver.com](https://caddyserver.com/) |
+  | **Traefik** | Designed for Docker, dynamic routing | [traefik.io](https://traefik.io/)           |
+  | **Nginx**   | Most flexible, widely supported      | [nginx.org](https://nginx.org/)             |
+  
+  ## 🧾 Example Configs
+  
+  > [!IMPORTANT]
+  > These configuration examples assume your reverse proxy is running inside Docker (alongside Notivae, via `docker-compose`).  
+  > If you're using a system-wide reverse proxy (e.g., Traefik or Nginx on the host system), replace:
+  >
+  > - `backend:80` with `http://localhost:8765`
+  > - `frontend:80` with `http://localhost:8766`
+  
+  ### 🪄 Caddy Example
+  
+  If you're using Docker Compose, create a `Caddyfile` like this:
+  
+  ```caddyfile
+  notivae.localhost
+  
+  handle_path /api/* {
+      reverse_proxy backend:80
+  }
+  
+  handle {
+      reverse_proxy frontend:80
+  }
+  ```
+  
+  And add a Caddy service to your `docker-compose.yml`:
+  
+  ```yaml
+  services:
+    caddy:
+      image: caddy:alpine
+      ports:
+        - "80:80"
+        - "443:443"
+      volumes:
+        - ./Caddyfile:/etc/caddy/Caddyfile
+      depends_on:
+        - frontend
+        - backend
+  ```
+  
+  > 💡 You’ll need to update `notivae.localhost` to your actual domain or host if not using `localhost`.
+  
+  ### ⚙️ Nginx Example
+  
+  If you're using Docker Compose, create a `nginx.conf` like this:
+  
+  ```nginx
+  server {
+      listen 80;
+      server_name notivae.localhost;
+  
+      location /api/ {
+          proxy_pass http://backend:80/;
+          proxy_http_version 1.1;
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+      }
+  
+      location / {
+          proxy_pass http://frontend:80/;
+      }
+  }
+  ```
+  
+  And add an nginx service to your `docker-compose.yml`:
+  
+  ```yaml
+  services:
+    nginx:
+      image: nginx:alpine
+      volumes:
+        - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      ports:
+        - "80:80"
+      depends_on:
+        - frontend
+        - backend
+  ```
+  
+  > 💡 You’ll need to update `notivae.localhost` to your actual domain or host if not using `localhost`.
+  
+  ## 🌍 Exposing to the Internet
+  
+  If you're self-hosting (e.g., on a home network or behind NAT), you'll need to expose your reverse proxy to the internet. There are two options:
+  
+  ### 1. Port Forwarding (Risky)
+  Open ports `80` and `443` on your router to your server. **Only recommended** if you know how to secure your server (firewalls, fail2ban, etc.).
+  
+  ### 2. Secure Tunnel (Recommended)
+  
+  Use a tunnel service to make your reverse proxy public without opening any ports:
+  
+  - **[Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/)**
+  - **[Ngrok](https://ngrok.com/)**
+  
+  These services let you tunnel traffic from a public domain to your local machine securely.
+  
+  ## 🧠 Alternative: Tunnel-Only Setup (No Reverse Proxy)
+  
+  If you’re using a tunnel provider like **Cloudflare Tunnel**, you can skip setting up a separate reverse proxy altogether.
+  
+  Configure your tunnel to forward:
+  
+  - `https://notivae.example.com/api/` → `http://localhost:8765`
+  - `https://notivae.example.com/` → `http://localhost:8766`
+  
+  This works because most tunnel providers allow advanced path-based routing. Notivae only requires that `/api/*` hits the backend on the same domain.
+  
+  > ✅ This is ideal for simple home or private setups with minimal config.
+  
+  ## ✅ Final Checklist
+  
+  - [x] You’ve confirmed `backend` and `frontend` are both running
+  - [x] You’ve either set up a reverse proxy *or* configured a tunnel-only setup
+  - [x] The `/api` path points to the backend, and `/` points to the frontend
+  - [x] If you're going public, you’ve configured HTTPS and/or tunneling
+  
+  Once all of this is in place, open your browser at:
+  
+  ```
+  http://notivae.localhost
+  ```
+  
+  (or your domain) — and the setup screen should appear 🎉
+  
+  ---
+  
+  > ℹ️ Having issues? Start by checking the container logs:
+  > 
+  > ```bash
+  > docker compose logs backend
+  > docker compose logs frontend
+  > docker compose logs caddy  # or nginx
+  > ```
+  
+  Still stuck? Look through our [troubleshooting guide](./troubleshooting.md) or otherwise open a [GitHub issue](https://github.com/notivae/notivae/issues).
+  
+
+---
+url: /start/installation/troubleshooting
+content: |
+  # 🛠️ Troubleshooting
+  
+  This page helps you resolve common issues encountered while setting up or running Notivae using Docker.
+  
+  If you're stuck on something not listed here, feel free to open an issue or check the [Contributing](../../other/contributing.md) guide.
+  
+  ## 🧩 Docker Setup Issues
+  
+  ### Docker/Docker Compose is not installed or not found
+  
+  **Symptoms**
+  - Running `docker` or `docker compose` returns `command not found`.
+  
+  **Solution**
+  - Ensure Docker and Docker Compose are installed correctly:
+    - [Install Docker](https://docs.docker.com/get-docker/)
+    - [Install Docker Compose](https://docs.docker.com/compose/install/)
+  - Restart your shell or terminal after installation.
+  
+  ## 📦 Container Won’t Start
+  
+  ### Ports are already in use
+  
+  **Symptoms**
+  - Error like:
+    ```
+    Bind for 0.0.0.0:8766 failed: port is already allocated
+    ```
+  
+  **Solution**
+  - Another service is using the same port.
+  - Run:
+    ```bash
+    sudo lsof -i :8766
+    ```
+    and kill the conflicting process or modify the port in `docker-compose.yml`.
+  
+  ---
+  
+  ### Environment variables are not set or invalid
+  
+  **Symptoms**
+  - Services crash on startup with unclear errors.
+  - Logs may reference missing configuration or fail to connect to other services.
+  
+  **Solution**
+  - Ensure you have a `.env` file in the root directory (`/srv/notivae-stack`) and that it's configured correctly.
+  - Check for:
+    - Missing values
+    - Quotes around special characters
+    - Line endings (use Unix line endings)
+  
+  ## 🧮 Database Errors
+  
+  ### Database container exits immediately
+  
+  **Symptoms**
+  - Running `docker compose up` shows the database container starting and then exiting or restarting in a loop.
+  
+  **Possible Causes**
+  - Invalid environment variables
+  - Volume permission issues
+  - Existing corrupt volume
+  
+  **Solutions**
+  - Double-check database config in `.env`
+  - Try resetting the volume (data will be lost):
+    ```bash
+    docker volume rm notivae_pgdata
+    ```
+  
+  ## 🖥️ Frontend is Blank or Unresponsive
+  
+  **Symptoms**
+  - You open `http://localhost:8766` and see a blank screen or a browser error.
+  
+  **Solutions**
+  - Check if all containers are running:
+    ```bash
+    docker compose ps
+    ```
+  - View frontend logs:
+    ```bash
+    docker compose logs web
+    ```
+  - Make sure the backend is reachable from the frontend container (`localhost` inside a container ≠ your host machine)
+  
+  ## 🧹 Cleanup Tips
+  
+  ### Removing all containers, volumes, and networks
+  
+  If you want to start over clean:
+  
+  ```bash
+  docker-compose down -v
+  ```
+  
+  This will remove all associated volumes (e.g., database data). Be careful — this is irreversible.
+  
+  ## 📄 Still Having Issues?
+  
+  Open an issue on the repository with logs, your `.env` config (redact sensitive info), and a description of what’s not working.
+  
+  We’re early in development and appreciate any feedback or bug reports!
+  
+  
+
+---
+url: /start/introduction
+content: |
+  # 🚀 Introduction to Notivae
+  
+  ## Why Notivae?
+  
+  Notivae was created to solve the limitations of existing knowledge and note-taking platforms. Tools like [Notion](https://www.notion.com/), [Outline](https://www.getoutline.com/), [Obsidian](https://obsidian.md/), [Logseq](https://logseq.com/), and [Joplin](https://joplinapp.org/) each offer parts of the solution—but not the whole. Some are closed-source, cloud-dependent, or hard to self-host. Others lack real-time collaboration, structured access control, or robust offline support.
+  
+  Notivae brings together the best of these systems while staying **fully self-hosted**, **markdown-native**, and **privacy-first**.
+  
+  ### 🔍 Feature Comparison
+  | Feature                                                  | Notivae | Notion | Outline | Obsidian | Logseq | Joplin |
+  |----------------------------------------------------------|:-------:|:------:|:-------:|:--------:|:------:|:------:|
+  | For Teams and Solo use                                   |    ✅    |   ✅    |    ✅    |    ❌     |   ⚠️   |   ❌    |
+  | Fully Self-Hosted                                        |    ✅    |   ❌    |   ⚠️    |    ✅     |   ✅    |   ✅    |
+  | Real-Time-Sync                                           |    ✅    |   ✅    |    ✅    |    ❌     |   ⚠️   |   ❌    |
+  | Real-time Collaboration                                  |    ✅    |   ✅    |    ✅    |    ❌     |   ⚠️   |   ⚠️   |
+  | Remote Access <br> (Internet-Ready)                      |    ✅    |   ✅    |    ✅    |    ⚠️    |   ⚠️   |   ⚠️   |
+  | Web-First UI <br> (no install needed)                    |    ✅    |   ✅    |    ✅    |    ❌     |   ❌    |   ⚠️   |
+  | Offline-First Support                                    |    ✅    |   ⚠️   |    ❌    |    ✅     |   ✅    |   ✅    |
+  | Hierarchical Documents                                   |    ✅    |   ✅    |    ✅    |    ✅     |   ✅    |   ✅    |
+  | Markdown-Native Editing                                  |    ✅    |   ⚠️   |    ✅    |    ✅     |   ✅    |   ✅    |
+  | Other Text-Based Documents <br> (code, note dumping, ..) |    ✅    |   ✅    |   ⚠️    |    ✅     |   ✅    |   ✅    |
+  | Export to Markdown/PDF                                   |    ✅    |   ✅    |   ⚠️    |    ✅     |   ✅    |   ✅    |
+  | Snapshot-Based Versioning                                |    ✅    |   ❌    |    ✅    |    ⚠️    |   ⚠️   |   ✅    |
+  | Inline Comments & Discussions                            |    ✅    |   ✅    |   ⚠️    |    ❌     |   ❌    |   ✅    |
+  | Per-User Access Control                                  |    ✅    |   ✅    |    ✅    |    ❌     |   ⚠️   |   ✅    |
+  
+  > ⚠️ = Partially supported or requires plugins/workarounds \
+  > ❌ = Not supported
+  
+  ## Got Feedback?
+  
+  Notivae is early-stage — rough, changing, and evolving. We'd love your input! Head to the [GitHub repo](https://github.com/notivae/notivae) to report issues, suggest improvements, or star the project.
+  
+  ---
+  
+  **Thanks for trying out Notivae.**
+  Your knowledge. Your structure. Your control.
+  
+  ## 🤖 LLMs.txt Support
+  
+  To improve compatibility with AI tools, Notivae provides a machine-readable [`llms.txt`](https://notivae.github.io/llms.txt) file.
+  
+  This file helps large language models (LLMs) — such as those used in AI-powered search, summarization, or assistant systems — understand the structure and content of our documentation. It includes clean, structured Markdown for each public page, along with its canonical URL.
+  
+  Developers building tools, bots, or integrations can use this to:
+  - Feed context into chat-based assistants
+  - Build semantic search or RAG pipelines
+  - Preprocess documentation for embedding/indexing
+  
+  📄 [View llms.txt](https://notivae.github.io/llms.txt)
+  
+
+---
+url: /start/requirements
+content: |
+  # 📋 Requirements
+  
+  This page outlines the minimum and recommended requirements for deploying and running **Notivae**. These requirements vary depending on your intended usage, number of users, and system workload.
+  
+  ## Prerequisites
+  
+  Notivae is deployed exclusively using **Docker** and **Docker Compose**. Ensure both are installed and functioning on your host system before proceeding with the [installation](./installation/index.md).
+  
+  ## CPU
+  
+  Notivae is designed to run on **low-powered hardware**, making it suitable for self-hosted deployments and lightweight environments. However, the **actual CPU requirements depend on the number of users and the expected workload**.
+  
+  Workload is influenced by factors such as:
+  - The number of concurrent users
+  - User activity (e.g., real-time collaboration, editing, and viewing frequency)
+  - Document complexity and size
+  - Usage of features like version history or media embedding
+  
+  For small teams or personal use, a single-core virtual CPU (vCPU) should be sufficient. For larger teams or public-facing instances, allocate more CPU resources to maintain performance under load.
+  
+  
+  ## Memory (RAM)
+  
+  - **Minimum**: 512MB  
+  - **Recommended**: 1GB or more for better performance
+  
+  Memory usage grows with the number of active users and document interactions. High concurrency, frequent edits, or large documents will increase memory demand.
+  
+  
+  ## Disk Requirements
+  
+  Disk performance can impact both the responsiveness and reliability of your Notivae instance.
+  
+  - **Storage Type**: SSDs are strongly recommended over HDDs for faster read/write operations, especially under load.
+  - **Storage Capacity**: The required disk space depends on:
+    - The number of users
+    - The volume and size of stored notes
+    - Any embedded content or attachments
+  
+  Plan for growth and monitor usage over time to avoid disruptions.
+  
+  
+  ## Other Dependencies
+  
+  ### Dedicated Domain or Sub-domain  
+  A dedicated domain or sub-domain (e.g., `notivae.example.com`) is **only required for public-facing deployments**, but it is **strongly recommended** even for internal or limited-use setups.
+  
+  Without a proper domain:
+  - Some features like **link-sharing** may not work reliably
+  - **Authentication providers** often require a valid domain for redirect URIs and session handling
+  - Cross-device or remote access may be limited or problematic
+  
+  While technically optional in private network environments, using a domain helps ensure full feature compatibility and smoother operation.
+  
+  ### Authentication Provider  
+  Authentication is **required** in Notivae to associate documents and data with individual user accounts. By default, Notivae includes a built-in authentication system using email or username and password.  
+  
+  Alternatively, Notivae can integrate with external authentication providers for single sign-on (SSO) or centralized user management. Supported providers include:
+  - OAuth2 providers (e.g., GitHub, GitLab, Discord)
+  - Any identity provider that supports OpenID Connect (OIDC)
+  
+  
+  ## Additional Recommendations
+  
+  - **HTTPS Support**: Use TLS/SSL certificates for encrypted traffic (strongly recommended, especially for public deployments).
+  - **Persistent Storage**: Ensure that your storage backend is reliable and backed up regularly. Document data and user metadata should be durable.
+  - **Reverse Proxy**: Set up a reverse proxy (e.g., Nginx, Caddy, or Traefik) to manage routing, SSL termination, and headers.
+  - **Monitoring and Logging**: Set up basic logging and metrics collection to track performance, detect issues early, and plan scaling.
+  
+
+---
+url: /usage/document-structure
+content: |
+  # 📄 Document Structure
+  
+  Notivae’s power lies in how you can organize your knowledge into clear, nested structures — making it easy to find, edit, and collaborate on content.
+  
+  ## Documents and Collections
+  
+  - **Collections** are like folders. They help you group related documents logically. (e.g. `Work` or `Studies`)
+  - **Documents** contain the actual markdown content.
+  
+  Each user’s workspace holds multiple collections, and each collection contains multiple documents.
+  
+  ## Nesting Documents
+  
+  Documents can be **nested inside other documents** to create deep hierarchies that mirror your thinking or project needs.
+  
+  Example:
+  
+  ```
+  📁 Programming Notes
+   ┣ 📄 Languages
+   ┃ ┣ 📄 Rust
+   ┃ ┗ 📄 Python
+   ┣ 📄 Tools
+   ┃ ┗ 📄 Docker
+   ┗ 📄 Personal Roadmap
+  ```
+  
+  This lets you structure your notes as folders and subfolders, but within the markdown document hierarchy.
+  
+  ## Benefits of Nested Structure
+  
+  - Organize large knowledge bases clearly
+  - Focus on small, manageable documents while keeping the big picture
+  - Enable granular access control at different hierarchy levels (planned)
+  - Support versioning and snapshots per document
+  
+  ## Navigation and UI
+  
+  Notivae’s UI reflects this hierarchy with:
+  
+  - Sidebar trees to browse collections and documents
+  - Breadcrumbs for context inside nested documents
+  - Quick search to jump between documents
+  
+  ---
+  
+  By structuring your knowledge this way, Notivae helps you maintain clarity, context, and control over your content — whether you’re working solo or collaborating.
+  
+
+---
+url: /usage/editor-guide
+content: |
+  <!-- @include: @/en/.in-work.md -->
+  
+
+---
+url: /usage/sharing-documents
+content: |
+  <!-- @include: @/en/.in-work.md -->
+  
+
+---
+url: /usage/workspace-management
+content: |
+  <!-- @include: @/en/.in-work.md -->
+  

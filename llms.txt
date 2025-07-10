@@ -110,29 +110,33 @@ content: |
   
   ## Environment Variables
   
-  ```dotenv
+  ::: code-group
+  ```dotenv [.env]
   DISCORD_CLIENT_ID=
   DISCORD_CLIENT_SECRET=
   ```
+  :::
   
   | Variable                | Description                      |
   |-------------------------|----------------------------------|
   | `DISCORD_CLIENT_ID`     | Your application's Client ID     |
   | `DISCORD_CLIENT_SECRET` | Your application's Client Secret |
   
-  ::: details Hidden Variables
+  :::: details Hidden Variables
   
-  ```dotenv
+  ::: code-group
+  ```dotenv [.env]
   DISCORD_DISCOVERY_URI=https://discord.com/.well-known/openid-configuration
   DISCORD_SCOPES="openid profile email"
   ```
+  :::
   
   | Variable                | Description                                           |
   |-------------------------|-------------------------------------------------------|
   | `DISCORD_DISCOVERY_URI` | Url to discord's OpenID configuration file            |
   | `DISCORD_SCOPES`        | Space-separated list of scopes requested during login |
   
-  :::
+  ::::
   
   ## Setup Instructions
   
@@ -161,6 +165,14 @@ content: |
      Replace `<YOUR_DOMAIN>` with your application's actual domain name.
   
   ![Add Redirects](assets/discord-redirect-url.png)
+  
+  ### Step 4: Apply changes and restart Notivae
+  
+  After updating your environment variables with the Discord credentials and settings, restart Notivae to apply the changes:
+  
+  ```shell
+  docker compose up -d --force-recreate
+  ```
   
 
 ---
@@ -268,12 +280,14 @@ content: |
   
   ## Environment Variables
   
-  ```dotenv
+  ::: code-group
+  ```dotenv [.env]
   OIDC_CLIENT_ID=
   OIDC_CLIENT_SECRET=
   OIDC_DISCOVERY_URI=https://auth.example.com/.well-known/openid-configuration
   OIDC_DISPLAY_NAME="OpenID"
   ```
+  :::
   
   | Variable             | Description                                                                                          |
   |----------------------|------------------------------------------------------------------------------------------------------|
@@ -282,17 +296,19 @@ content: |
   | `OIDC_DISCOVERY_URI` | The URI pointing to the OIDC discovery document (usually ends in `.well-known/openid-configuration`) |
   | `OIDC_DISPLAY_NAME`  | The name shown to users during login (e.g., "Login with OpenID")                                     |
   
-  ::: details Hidden Variables
+  :::: details Hidden Variables
   
-  ```dotenv
+  ::: code-group
+  ```dotenv [.env]
   OIDC_SCOPES="openid profile email"
   ```
+  :::
   
   | Variable                | Description                                           |
   |-------------------------|-------------------------------------------------------|
   | `OIDC_SCOPES`           | Space-separated list of scopes requested during login |
   
-  :::
+  ::::
   
   ## Common Parameter
   
@@ -306,7 +322,43 @@ content: |
 ---
 url: /hosting/authentication/password
 content: |
-  <!-- @include: @/en/.in-work.md -->
+  # Authentication via Email + Password
+  
+  This guide explains how to set up password-based authentication (commonly referred to as "local auth") for your application.
+  
+  Password-based authentication works out of the box and is the simplest authentication mode to set up. It does not rely on any third-party authentication providers like Discord, GitHub, or Reddit—everything is handled internally by your application. This makes it an ideal choice for simple setups, single-user environments, or when you want full control over the authentication flow without external dependencies.
+  
+  ## Environment Variables
+  
+  ::: code-group
+  ```dotenv [.env]
+  AUTO_LOCAL_ENABLED=True
+  ```
+  :::
+  
+  | Variable              | Description                                  |
+  |-----------------------|----------------------------------------------|
+  | `AUTO_LOCAL_ENABLED`  | Enables the built-in local auth system       |
+  
+  ## Setup Instructions
+  
+  ### Step 1: Enable Local Authentication
+  
+  Set the following environment variable in your deployment or `.env` file:
+  
+  ::: code-group
+  ```dotenv [.env]
+  AUTO_LOCAL_ENABLED=True
+  ```
+  :::
+  
+  ### Step 2: Apply changes and restart Notivae
+  
+  After updating your environment variables, restart Notivae to apply the changes:
+  
+  ```shell
+  docker compose up -d --force-recreate
+  ```
   
 
 ---
@@ -336,7 +388,7 @@ content: |
 ---
 url: /hosting/configuration/mail-support
 content: |
-  # Mail Support (Optional)
+  # 📧 Mail Support (Optional)
   
   The mail service is **optional**, but highly recommended if you want to enable features like:
   
@@ -356,7 +408,8 @@ content: |
   
   ## Environment Variables
   
-  ```dotenv
+  ::: code-group
+  ```dotenv [.env]
   MAIL_SERVER=
   MAIL_PORT=
   MAIL_USE_CREDENTIALS=true
@@ -368,6 +421,7 @@ content: |
   MAIL_VALIDATE_CERTS=true
   MAIL_TEMPLATES_DIR=
   ```
+  :::
   
   | Variable               | Description                                                                                      |
   |------------------------|--------------------------------------------------------------------------------------------------|
@@ -401,7 +455,8 @@ content: |
   
   ### Gmail (App Passwords)
   
-  ```dotenv
+  ::: code-group
+  ```dotenv [.env]
   MAIL_SERVER=smtp.gmail.com
   MAIL_PORT=465
   MAIL_USE_CREDENTIALS=true
@@ -411,10 +466,12 @@ content: |
   MAIL_USE_TLS=true
   MAIL_VALIDATE_CERTS=true
   ```
+  :::
   
   ### Mailgun
   
-  ```dotenv
+  ::: code-group
+  ```dotenv [.env]
   MAIL_SERVER=smtp.mailgun.org
   MAIL_PORT=587
   MAIL_USE_CREDENTIALS=true
@@ -424,10 +481,12 @@ content: |
   MAIL_START_TLS=true
   MAIL_VALIDATE_CERTS=true
   ```
+  :::
   
   ### Localhost (No Auth, No TLS)
   
-  ```dotenv
+  ::: code-group
+  ```dotenv [.env]
   MAIL_SERVER=localhost
   MAIL_PORT=25
   MAIL_USE_CREDENTIALS=false
@@ -436,22 +495,26 @@ content: |
   MAIL_START_TLS=false
   MAIL_VALIDATE_CERTS=false
   ```
+  :::
   
   ## Optional: Email Templates
   
   The mail system comes with built-in HTML templates rendered using **Jinja2**.  
   To override any of them, you can mount a custom template directory and set:
   
-  ```dotenv
+  ::: code-group
+  ```dotenv [.env]
   MAIL_TEMPLATES_DIR=/templates/emails
-  ````
+  ```
+  :::
   
   Each custom template file must match the filename (and extension) of the default it's replacing.
   The expected extension is: **`.html.j2`**
   
   Modify you `docker-compose.yml` to mount your templates and set the environment variable.
   
-  ```yaml
+  ::: code-group
+  ```yaml [docker-compose.yml]
   services:
     server:
       image: ghcr.io/notivae/server
@@ -461,6 +524,7 @@ content: |
       volumes:
         - ./my-custom-templates:/templates/emails:ro
   ```
+  :::
   
   This will override any built-in template that has a matching `.html.j2` file in `./my-custom-templates`.
   
@@ -491,43 +555,37 @@ content: |
   
   Notivae supports **optional virus scanning** for uploaded files. This feature is designed to improve security in environments where users can upload arbitrary attachments — especially in multi-user or publicly accessible deployments.
   
-  ## ✅ Overview
+  ## When to Enable Virus Scanning
   
-  Virus scanning is **disabled by default** and only activates if the following two environment variables are set:
-  
-  ```env
-  CLAMAV_HOST=<host>
-  CLAMAV_PORT=<port>
-  ```
-  
-  When both are defined, Notivae will attempt to connect to the ClamAV service. If the connection fails at runtime while virus scanning is enabled, **file uploads will be rejected** for safety.
-  
-  ## 🔧 When to Enable Virus Scanning
-  
-  You should enable virus scanning when:
+  You should **enable virus scanning** if:
   
   - Notivae is hosted on a **public-facing server**
-  - You allow **guest access via shared links**
-  - You're running Notivae in an **enterprise or shared environment**
-  - You want defense against **known malware or trojan file uploads**
+  - You allow **guest access** via shared links
+  - You're running Notivae in an **enterprise or shared multi-user environment**
+  - You want basic protection against **known malware and trojans**
   
-  It’s typically **not necessary** for:
-  - Local, private deployments
-  - Environments where all users are trusted
+  You can likely **skip enabling scanning** if:
   
-  ## 🔍 How It Works
+  - You're running a **local or private deployment**
+  - **All users are trusted**, such as in internal dev/test setups
   
-  When enabled:
-  - Uploaded attachments are streamed to disk
-  - Once stored, the file is scanned using the ClamAV service
-  - If a threat is detected, the file is immediately deleted and the upload fails with an error
-  - Clean files proceed as normal
+  ## Environment Variables
   
-  ## 🐳 Docker Compose Setup
+  Virus scanning is **disabled by default**. To enable it, you must set the `CLAMAV_HOST` environment variable:
+  
+  ```dotenv
+  CLAMAV_HOST=
+  CLAMAV_PORT=3310
+  ```
+  
+  Once defined, Notivae will attempt to connect to the ClamAV service. If the connection fails while virus scanning is enabled, **file uploads will be rejected** as a safety precaution.
+  
+  ## How to Set Up Virus Scanning
   
   To enable virus scanning, add the ClamAV service to your `docker-compose.yml`:
   
-  ```yaml
+  ::: code-group
+  ```yaml [docker-compose.yml]
   services:
     clamav:
       image: clamav/clamav:stable_base
@@ -538,10 +596,38 @@ content: |
   volumes:
     clamav-db:
   ```
+  :::
   
-  This image automatically checks for virus database updates **once per day**.
+  Then configure your `.env` file with the required environment variables:
   
-  ## ⚠️ Resource Requirements
+  ::: code-group
+  ```dotenv [.env]
+  CLAMAV_HOST=clamav
+  CLAMAV_PORT=3310
+  ```
+  :::
+  
+  The official ClamAV image automatically updates its virus definitions **once per day**.
+  
+  > [!WARNING]
+  > During these updates, ClamAV may temporarily use **up to double its normal RAM** due to *concurrent reloading*. This mechanism allows scans to continue while ClamAV reloads its updated virus signatures, but it means memory usage can spike briefly. Ensure your host system has enough headroom to handle these periodic memory peaks, especially on low-memory environments.
+  
+  ### 🔍 Testing Virus Scanning
+  
+  To confirm virus scanning is active and functioning, use the **EICAR test file** — a harmless file designed to trigger antivirus systems:
+  
+  - Download or create it using the string provided at: <https://www.eicar.org/download-anti-malware-testfile/>
+  - Upload the file to Notivae
+  
+  If the scanner is correctly integrated, the upload will be rejected with an error like:
+  
+  ```
+  Virus detected: Eicar-Test-Signature
+  ```
+  
+  This confirms scanning is working as expected.
+  
+  ## Resource Requirements
   
   ClamAV requires a **significant amount of RAM** to function properly. According to official documentation:
   
@@ -550,19 +636,12 @@ content: |
   
   You should not enable virus scanning on hosts with limited memory or swap space unless you're confident in available resources.
   
-  ## 🧪 Testing Virus Scanning
+  ## How It Works
   
-  To verify that virus scanning is active and working, you can use the **EICAR test file**, a harmless file designed to trigger antivirus systems.
-  
-  Download or create it using the official test string: <https://www.eicar.org/download-anti-malware-testfile/>
-  
-  Upload this file to Notivae. If scanning is active, it will be rejected with a message like:
-  
-  ```
-  Virus detected: Eicar-Test-Signature
-  ```
-  
-  This confirms that your scanner integration is functional.
+  When enabled:
+  - Any uploaded attachments are scanned using the ClamAV service
+  - If a threat is detected, the file is immediately deleted and the upload fails with an error
+  - Clean files proceed as normal
   
 
 ---
@@ -955,53 +1034,59 @@ content: |
   
   Notivae is in **early-stage development**. No features are fully implemented yet — everything listed below is planned but still in progress or under design. This roadmap gives a transparent view of where the project is heading.
   
+  ---
+  
+  > [!WARNING] 🚧 Everything is subject to change.  
+  > You can track progress or contribute on [GitHub](https://github.com/notivae/notivae).
+  
   ## 🧱 Planned Foundation
   
-  - Personal workspace per user
-  - Markdown-based document editor
-  - Collections for organizing documents
-  - Document nesting and hierarchy
-  - Offline-first editing
-  - Sync-on-connect model using CRDTs
-  - Snapshot-based versioning
-  - Inline comments and discussions
-  - Email/password authentication
-  - OIDC-based third-party login
-  - Self-hostable via Docker Compose
+  - [ ] Personal workspace per user
+  - [ ] Markdown-based document editor
+  - [ ] Collections for organizing documents
+  - [ ] Document nesting and hierarchy
+  - [ ] Offline-first editing
+  - [ ] Sync-on-connect model using CRDTs
+  - [ ] Snapshot-based versioning
+  - [ ] Inline comments and discussions
+  - [X] Email/password authentication
+  - [ ] third-party authentication providers
+  - [X] OIDC-based third-party login
+  - [ ] Self-hostable via Docker Compose
   
   ## 🛠️ Upcoming Development Focus
   
-  - Frontend: editor UI, navigation, commenting
-  - Backend: data model, auth, syncing, access control
-  - Database schema
-  - First working end-to-end Docker setup
-  - Persistent volume storage and backup support
-  - CI for ghcr.io image builds
+  - [ ] Frontend: editor UI, navigation, commenting
+  - [ ] Backend: data model, auth, syncing, access control
+  - [ ] Database schema
+  - [ ] First working end-to-end Docker setup
+  - [ ] Persistent volume storage and backup support
+  - [ ] CI for ghcr.io image builds
   
   ## 🧪 Future Features
   
-  - Public sharing via links
-  - Invite-based sharing with per-user access control
-  - Full-text search across documents
-  - Export to PDF / Markdown
-  - Admin interface
-  - Comment threading & resolution
-  - Snapshot diffs
-  - Configurable themes
-  - REST and WebSocket APIs
-  - Mobile-first PWA enhancements
+  - [ ] Public sharing via links
+  - [ ] Invite-based sharing with per-user access control
+  - [ ] Full-text search across documents
+  - [ ] Export to PDF / Markdown
+  - [ ] Admin interface
+  - [ ] Comment threading & resolution
+  - [ ] Snapshot diffs
+  - [ ] Configurable themes
+  - [ ] REST and WebSocket APIs
+  - [ ] Mobile-first PWA enhancements
   
   ## 🧭 Long-Term Vision
   
-  - Shared workspaces (teams, organizations)
-  - Plugin system for extensibility
-  - Self-hosted AI integration (summarization, search)
-  - Custom metadata fields for documents
-  - Workspace analytics and activity feed
+  - [ ] Shared workspaces (teams, organizations)
+  - [ ] Plugin system for extensibility
+  - [ ] Self-hosted AI integration (summarization, search)
+  - [ ] Custom metadata fields for documents
+  - [ ] Workspace analytics and activity feed
   
   ---
   
-  > 🚧 Everything is subject to change.  
+  > [!WARNING] 🚧 Everything is subject to change.  
   > You can track progress or contribute on [GitHub](https://github.com/notivae/notivae).
   
 
@@ -1220,7 +1305,8 @@ content: |
   
   If you're using Docker Compose, create a `Caddyfile` like this:
   
-  ```caddyfile
+  ::: code-group
+  ```caddyfile [Caddyfile]
   notivae.localhost
   
   handle_path /api/* {
@@ -1231,10 +1317,12 @@ content: |
       reverse_proxy frontend:80
   }
   ```
+  :::
   
   And add a Caddy service to your `docker-compose.yml`:
   
-  ```yaml
+  ::: code-group
+  ```yaml [docker-compose.yml]
   services:
     caddy:
       image: caddy:alpine
@@ -1247,6 +1335,7 @@ content: |
         - frontend
         - backend
   ```
+  :::
   
   > 💡 You’ll need to update `notivae.localhost` to your actual domain or host if not using `localhost`.
   
@@ -1254,7 +1343,8 @@ content: |
   
   If you're using Docker Compose, create a `nginx.conf` like this:
   
-  ```nginx
+  ::: code-group
+  ```nginx [nginx.conf]
   server {
       listen 80;
       server_name notivae.localhost;
@@ -1271,10 +1361,12 @@ content: |
       }
   }
   ```
+  :::
   
   And add an nginx service to your `docker-compose.yml`:
   
-  ```yaml
+  ::: code-group
+  ```yaml [docker-compose.yml]
   services:
     nginx:
       image: nginx:alpine
@@ -1286,6 +1378,7 @@ content: |
         - frontend
         - backend
   ```
+  :::
   
   > 💡 You’ll need to update `notivae.localhost` to your actual domain or host if not using `localhost`.
   
